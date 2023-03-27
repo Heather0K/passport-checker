@@ -2,6 +2,10 @@ import styled from 'styled-components'
 import Link from 'next/link'
 import {useGetTimeBetween} from "../hooks/use-get-time-diff";
 import {useState} from "react";
+import MagicIcon from "../public/icons/magic";
+import TickIcon from "../public/icons/tick";
+import NoEntryIcon from "../public/icons/noentry";
+import PlaneIcon from "../public/icons/plane";
 
 const FlexContainer = styled.div`
   display: flex;
@@ -10,28 +14,74 @@ const FlexContainer = styled.div`
   flex-flow: column wrap;
   max-width: 800px;
   margin-top: 3rem;
+  
+  font-weight: 500;
 `
 
-const Card = styled.div`
-  padding: 1.5rem;
-  color: inherit;
-  text-decoration: none;
-  border: 1px solid black;
-  border-radius: 10px;
-  transition: color 0.15s ease, border-color 0.15s ease;
-  width: 100%;
+const Result = styled.div`
+    border: 2px solid pink;
+`
 
-  &:hover,
-  :focus,
-  :active {
-    color: #0070f3;
-    border-color: #0070f3;
+const FormContainer = styled.form`
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: space-between;
+`
+
+const FormItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  padding: 1em;
+  
+  & label {
+    font-size: 1.2rem;
+    padding: 0.5em;
+
+    :hover {
+      svg {
+        transform: translate(120px);
+        opacity: 0;
+      }
+    }
+    
+    svg {
+      vertical-align: middle;
+      transform: rotateZ(-45deg);
+      transition: all ease 0.5s;      
+   
+    }
   }
+
+  & input {
+    font-size: 1rem;
+    height: 50px;
+    width: 150px;
+    border: 2px solid black;
+    transition: all ease 0.2s;
+    border-radius: 12px;
+  }
+
 `
 
-const StyledA = styled.a`
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
+const SubmitButton = styled.button`
+  height: 50px;
+  width: 400px;
+  font-weight: 500;
+  font-size: 18px;
+  border: 2px solid black;
+  background-color: #fcd867;
+  border-radius: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: all ease 0.2s;
+
+  :hover {
+    cursor: pointer;
+    transform: translateY(2px);
+    box-shadow: 0 10px 20px 2px rgba(0, 0, 0, 0.25);
+  }
 `
 
 export default function Form() {
@@ -41,42 +91,44 @@ export default function Form() {
 
     const [issueValid, setIssueValid] = useState(null);
 
-    console.log(issueValid)
-
-
     const handleSubmit = async (event) => {
         event.preventDefault()
 
         const data = {
             issue: event.target.issue.value,
             expiry: event.target.expiry.value,
+            travel: event.target.travel.value,
         }
-        console.log(todayDate, data.issue)
         const printReadable = useGetTimeBetween(data.issue, todayDate);
         console.log(printReadable)
-
     }
 
     return (
         <FlexContainer>
 
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="issue">Issue date</label>
-                <input type="date" id="issue" name="issue" required/>
+            <Result></Result>
 
-                <label htmlFor="expiry">Expiry Date</label>
+            <FormContainer onSubmit={handleSubmit}>
+                <div style={{display: 'flex'}}>
+                <FormItem>
+                    <label htmlFor="issue">Issue date </label>
+                    <input type="date" id="issue" name="issue" required/>
+                </FormItem>
+
+                <FormItem>
+                <label htmlFor="expiry">Expiry Date </label>
                 <input type="date" id="expiry" name="expiry" required/>
+                </FormItem>
 
-                <button type="submit">Submit</button>
+                <FormItem>
+                <label htmlFor="expiry">Travel Date <PlaneIcon/></label>
+                <input type="date" id="travel" name="travel" required/>
+                </FormItem>
+                </div>
 
-            </form>
+                <SubmitButton type="submit">Check your passport <MagicIcon/></SubmitButton>
 
-            <p>If you’re planning to travel in the EU, Norway, Switzerland, Iceland or Liechtenstein:</p>
-         your passport should have at lest 3 months left on the expiry date from the date you plan to leave
-          and it ahould be less than 10 years old (issue date) on the day you enter the country
-
-            <sup> Please double check yourself before traveling, this site does not account for leap years or Febuary.. and is only meant to be a fun project
-            because I apparently think date math in javascript is fun </sup>
+            </FormContainer>
 
         </FlexContainer>
     )

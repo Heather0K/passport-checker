@@ -34,7 +34,6 @@ export function useGetTimeBetween(start: any, end: any) {
         const rem = newRemArr.map(r => {return `${r.value} ${r.name}`});
         const printReadable = `${diff.value} ${diff.name} ${rem} ago`;
 
-
     return {
         diffYears,
         diffMonths,
