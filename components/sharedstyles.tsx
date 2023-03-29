@@ -5,7 +5,6 @@ const Container = styled.div`
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   min-height: 100vh;
 `
 const Main = styled.main`
