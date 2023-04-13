@@ -4,6 +4,7 @@ export function useGetTimeBetween(start: any, end: any) {
     const date2 = new Date(end);
 
     //get total days
+    // @ts-ignore
     const diffDays = Math.floor((date2 - date1) / (1000 * 3600 * 24));
 
     // get total years / months ect
