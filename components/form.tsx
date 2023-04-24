@@ -5,6 +5,8 @@ import MagicIcon from "../public/icons/magic";
 import TickIcon from "../public/icons/tick";
 import NoEntryIcon from "../public/icons/noentry";
 import PlaneIcon from "../public/icons/plane";
+import {Error} from "./sharedstyles"
+import WarningIcon from "../public/icons/warning";
 
 const FlexContainer = styled.div`
   display: flex;
@@ -12,8 +14,7 @@ const FlexContainer = styled.div`
   justify-content: center;
   flex-flow: column wrap;
   max-width: 800px;
-  margin-top: 3rem;
-
+  margin-top: 1rem;
   font-weight: 500;
 `
 
@@ -70,11 +71,17 @@ const FormItem = styled.div`
     border-radius: 12px;
   }
 
+  &[data-is-error='true'] {
+    input {
+      border-color: #d91919;
+    }
+
+  }
 `
 
 const SubmitButton = styled.button`
   height: 50px;
-  width: 400px;
+  width: 250px;
   font-weight: 500;
   font-size: 18px;
   border: 2px solid black;
@@ -90,6 +97,9 @@ const SubmitButton = styled.button`
     box-shadow: 0 10px 20px 2px rgba(0, 0, 0, 0.25);
   }
 `
+const ResetButton = styled(SubmitButton)`
+  background-color: #e5e5e3;
+`;
 
 export default function Form() {
 
@@ -102,9 +112,12 @@ export default function Form() {
     const [readableAge, setReadableAge] = useState('');
     const [readableExpiry, setReadableExpiry] = useState('');
     const [lastDate, setLastDate] = useState('');
+    const [issueExpError, setIssueExpError] = useState(false);
+    const [expTravelError, setExpTravelError] = useState(false);
 
+    const isError = issueExpError || expTravelError;
+    const handleSubmit = (event) => {
 
-    const handleSubmit = async (event) => {
         setIsLoading(true)
         event.preventDefault()
 
@@ -113,54 +126,88 @@ export default function Form() {
             expiry: event.target.expiry.value,
             travel: event.target.travel.value,
         }
-        const {printReadable: readableAge, diffMonths: issueMonths} = useGetTimeBetween(data.issue, todayDate);
-        const {
-            printReadable: readableTravelDiff,
-            diffMonths: expiryMonths
-        } = useGetTimeBetween(data.travel, data.expiry);
-        const {printReadable: expiry} = useGetTimeBetween(todayDate, data.expiry);
 
+        if (data.issue >= data.expiry || data.expiry <= data.travel) {
+            setIssueExpError(data.issue >= data.expiry)
+            setExpTravelError(data.expiry <= data.travel)
 
-        const expiryDate = new Date(data.expiry);
-        expiryDate.setDate(expiryDate.getDate() - 90);
+        } else {
 
+            const {printReadable: readableAge, diffMonths: issueMonths} = useGetTimeBetween(data.issue, todayDate);
+            const {diffMonths: expiryMonths} = useGetTimeBetween(data.travel, data.expiry);
+            const {printReadable: expiry} = useGetTimeBetween(todayDate, data.expiry);
 
-        setPassAge(issueMonths)
-        setTravelDiff(expiryMonths)
-        setReadableAge(readableAge)
-        setReadableExpiry(expiry)
-        setLastDate(expiryDate.toDateString())
+            const expiryDate = new Date(data.expiry);
+            expiryDate.setDate(expiryDate.getDate() - 90);
+
+            setPassAge(issueMonths)
+            setTravelDiff(expiryMonths)
+            setReadableAge(readableAge)
+            setReadableExpiry(expiry)
+            setLastDate(expiryDate.toDateString())
+
+        }
         setIsLoading(false)
-
     }
 
+    const handleReset = async (event) => {
+        setPassAge(null)
+        setTravelDiff(null)
+        setReadableAge(null)
+        setReadableExpiry(null)
+        setLastDate(null)
+        setExpTravelError(false)
+        setIssueExpError(false)
+
+    }
     return (
         <FlexContainer>
+            <FormContainer onSubmit={handleSubmit} onReset={handleReset}>
+                {isError && (
+                    <Error>
+                        {issueExpError && <p><WarningIcon/> The issue date must be before the expiry date</p>}
+                        {expTravelError && <p><WarningIcon/> The travel date must be before the expiry date</p>}
+                    </Error>
+                )}
 
-
-            <FormContainer onSubmit={handleSubmit}>
                 <div style={{display: 'flex'}}>
-                    <FormItem>
+                    <FormItem data-is-error={issueExpError}>
                         <label htmlFor="issue">Issue date </label>
                         <input type="date" id="issue" name="issue" required/>
                     </FormItem>
 
-                    <FormItem>
-                        <label htmlFor="expiry">Expiry Date </label>
-                        <input type="date" id="expiry" name="expiry" required/>
+                    <FormItem data-is-error={isError}>
+                        <label htmlFor="expiry">Expiry Date</label>
+                        <input
+                            type="date"
+                            id="expiry"
+                            name="expiry"
+                            required
+                            min={new Date().toISOString().split("T")[0]}
+                        />
                     </FormItem>
 
-                    <FormItem>
-                        <label htmlFor="expiry">Travel Date <PlaneIcon/></label>
-                        <input type="date" id="travel" name="travel" required/>
+                    <FormItem data-is-error={expTravelError}>
+                        <label htmlFor="travel">Travel Date<PlaneIcon/></label>
+                        <input
+                            type="date"
+                            id="travel"
+                            name="travel"
+                            required
+                            min={new Date().toISOString().split("T")[0]}
+                        />
                     </FormItem>
                 </div>
 
-                <SubmitButton type="submit">Check your passport <MagicIcon/></SubmitButton>
-
+                <div style={{display: 'flex'}}>
+                    {passAge || isError ? (
+                        <ResetButton type="reset">Clear form </ResetButton>
+                    ) : null}
+                    <SubmitButton type="submit">Check your passport <MagicIcon/></SubmitButton>
+                </div>
             </FormContainer>
 
-            {!isLoading && passAge && (
+            {!isLoading && passAge && !isError && (
                 <Result>
                     <p> Passport is less than 10 years old ? {passAge < 120 ? <TickIcon fill={'green'}/> :
                         <NoEntryIcon fill={'red'}/>} </p>
@@ -173,7 +220,6 @@ export default function Form() {
                     <p> The last date you can travel in the EU is {lastDate} </p>
                 </Result>
             )}
-
 
         </FlexContainer>
     )
