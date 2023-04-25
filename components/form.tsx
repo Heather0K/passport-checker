@@ -44,12 +44,11 @@ const FormItem = styled.div`
   text-align: center;
   padding: 1em;
   flex-grow: 1;
-
   @media screen and (max-width: 600px) {
     width: 100%;
-    min-width: 300px;
     & input {
       min-width: 300px;
+      align-self: center;
     }
   }
 
@@ -100,6 +99,7 @@ const SubmitButton = styled.button`
   margin-left: auto;
   margin-right: auto;
   transition: all ease 0.2s;
+  color: black;
 
   :hover {
     cursor: pointer;
