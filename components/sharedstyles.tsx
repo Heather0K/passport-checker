@@ -8,11 +8,10 @@ export const Container = styled.div`
   min-height: 100vh;
 `
 export const Main = styled.main`
-  padding: 5rem 0;
+  padding: 5rem 1rem;
   flex: 1;
   display: flex;
   flex-direction: column;
- 
   align-items: center;
 `
 

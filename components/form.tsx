@@ -16,6 +16,7 @@ const FlexContainer = styled.div`
   max-width: 800px;
   margin-top: 1rem;
   font-weight: 500;
+  flex-wrap: wrap;
 `
 
 const Result = styled.div`
@@ -42,6 +43,7 @@ const FormItem = styled.div`
   flex-direction: column;
   text-align: center;
   padding: 1em;
+  flex-grow: 1;
 
   & label {
     font-size: 1.2rem;
@@ -65,7 +67,7 @@ const FormItem = styled.div`
   & input {
     font-size: 1rem;
     height: 50px;
-    width: 150px;
+    width: 100%;
     border: 2px solid black;
     transition: all ease 0.2s;
     border-radius: 12px;
@@ -96,6 +98,12 @@ const SubmitButton = styled.button`
     transform: translateY(2px);
     box-shadow: 0 10px 20px 2px rgba(0, 0, 0, 0.25);
   }
+  @media screen and (max-width: 600px) {
+    width: 190px;
+
+    @media screen and (max-width: 400px) {
+   width: 150px;
+  }
 `
 const ResetButton = styled(SubmitButton)`
   background-color: #e5e5e3;
@@ -118,6 +126,7 @@ export default function Form() {
     const isError = issueExpError || expTravelError;
     const handleSubmit = (event) => {
 
+        console.log(new Date().toISOString().split("T")[0])
         setIsLoading(true)
         event.preventDefault()
 
@@ -170,10 +179,17 @@ export default function Form() {
                     </Error>
                 )}
 
-                <div style={{display: 'flex'}}>
+                <div style={{display: 'flex', flexWrap: 'wrap'}}>
                     <FormItem data-is-error={issueExpError}>
                         <label htmlFor="issue">Issue date </label>
-                        <input type="date" id="issue" name="issue" required/>
+                        <input
+                            type="date"
+                            id="issue"
+                            name="issue"
+                            required
+                            max={'2050-01-01'}
+                            min={'1990-01-01'}
+                        />
                     </FormItem>
 
                     <FormItem data-is-error={isError}>
@@ -184,6 +200,7 @@ export default function Form() {
                             name="expiry"
                             required
                             min={new Date().toISOString().split("T")[0]}
+                            max={'2050-01-01'}
                         />
                     </FormItem>
 
@@ -195,6 +212,7 @@ export default function Form() {
                             name="travel"
                             required
                             min={new Date().toISOString().split("T")[0]}
+                            max={'2050-01-01'}
                         />
                     </FormItem>
                 </div>
