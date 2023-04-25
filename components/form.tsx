@@ -45,7 +45,11 @@ const FormItem = styled.div`
   padding: 1em;
   flex-grow: 1;
 
-  & label {
+  @media screen and (max-width: 600px) {
+    width: 100%;
+  }
+
+    & label {
     font-size: 1.2rem;
     padding: 0.5em;
 
@@ -99,14 +103,13 @@ const SubmitButton = styled.button`
     box-shadow: 0 10px 20px 2px rgba(0, 0, 0, 0.25);
   }
   @media screen and (max-width: 600px) {
-    width: 190px;
-
-    @media screen and (max-width: 400px) {
-   width: 150px;
+    width: 100%;
+    margin: 1em;
   }
 `
 const ResetButton = styled(SubmitButton)`
   background-color: #e5e5e3;
+  margin-right: 1em;
 `;
 
 export default function Form() {
@@ -217,10 +220,10 @@ export default function Form() {
                     </FormItem>
                 </div>
 
-                <div style={{display: 'flex'}}>
-                    {passAge || isError ? (
+                <div style={{display: 'flex', flexWrap: 'wrap'}}>
+                    {/*{passAge || isError ? (*/}
                         <ResetButton type="reset">Clear form </ResetButton>
-                    ) : null}
+                    {/*) : null}*/}
                     <SubmitButton type="submit">Check your passport <MagicIcon/></SubmitButton>
                 </div>
             </FormContainer>
